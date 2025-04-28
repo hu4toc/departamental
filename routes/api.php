@@ -29,6 +29,7 @@ Route::post('/personas', [PersonaController::class, 'store']);
 Route::get('/personas', [PersonaController::class, 'index']);
 Route::get('/personas/docentes', [PersonaController::class, 'docentes']);
 Route::get('/personas/integrantes', [PersonaController::class, 'integrantes']);
+Route::get('/personas/{id}/foto', [PersonaController::class, 'mostrarPersonaPorId']);
 
 // Institutos
 Route::get('/institutos', [InstitutoController::class, 'index']);

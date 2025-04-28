@@ -14,7 +14,7 @@ class PersonaController extends Controller
 {
     public function index()
     {
-        $personas = Persona::all();
+        $personas = Persona::orderBy('id', 'desc')->get();
         $totalRegistros = count($personas);
         
 
@@ -78,5 +78,24 @@ class PersonaController extends Controller
             'success' => true,
             'message' => 'Persona creada correctamente.',
         ], 201);
+    }
+
+    public function mostrarPersonaPorId($id) {
+        $persona = Persona::find($id);
+
+        if (!$persona || !$persona->foto) {
+            return response()->json(['message' => 'Imagen no encontrada'], 404);
+        }
+
+        $path = 'departamental/' . $persona->foto;
+
+        if (!Storage::disk('local')->exists($path)) {
+            return response()->json(['message' => 'Archivo no encontrado en el servidor'], 404);
+        }
+
+        $file = Storage::get($path);
+        $mimeType = Storage::mimeType($path);
+
+        return response($file, 200)->header('Content-Type', $mimeType);
     }
 }
