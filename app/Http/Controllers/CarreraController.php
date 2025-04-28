@@ -19,4 +19,17 @@ class CarreraController extends Controller
             'totalRegistros' => $totalRegistros
         ], 200);
     }
+
+    public function select()
+    {
+        $carreras = Carrera::select(
+            'id as code',
+            'nombre as label'
+        )->get();
+
+        return response()->json([
+            'success' => true, 
+            'data' => $carreras
+        ], 200);
+    }
 }

@@ -19,4 +19,17 @@ class InstitutoController extends Controller
             'totalRegistros' => $totalRegistros
         ], 200);
     }
+
+    public function select()
+    {
+        $institutos = Instituto::select(
+                'id as code',
+                'nombre as label'
+            )->get();
+
+        return response()->json([
+            'success' => true, 
+            'data' => $institutos
+        ], 200);
+    }
 }

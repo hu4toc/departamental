@@ -29,15 +29,20 @@ Route::get('/personas/docentes', [PersonaController::class, 'docentes']);
 
 // Institutos
 Route::get('/institutos', [InstitutoController::class, 'index']);
+Route::get('/institutos/select', [InstitutoController::class, 'select']);
 
 // Carreras
 Route::get('/carreras', [CarreraController::class, 'index']);
+Route::get('/carreras/select', [CarreraController::class, 'select']);
 
 // Proyectos
 Route::get('/proyectos', [ProyectoController::class, 'index']);
+Route::post('/proyectos', [ProyectoController::class, 'store']);
 Route::get('/proyectos/{id}', [ProyectoController::class, 'show']);
 Route::get('/proyectos/{id}/integrantes', [ProyectoController::class, 'integrantes']);
 Route::get('/proyectos/{id}/calificaciones', [ProyectoController::class, 'calificaciones']);
+Route::get('/proyectos/{id}/portada', [ProyectoController::class, 'mostrarPortadaPorId']);
+Route::get('/proyectos/{id}/documento', [ProyectoController::class, 'mostrarDocumentoPorId']);
 
 // Evaluacion
 Route::post('/evaluacion', [EvaluacionController::class, 'store']);

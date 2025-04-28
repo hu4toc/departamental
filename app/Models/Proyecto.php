@@ -14,6 +14,7 @@ class Proyecto extends Model
         'descripcion',
         'portada',
         'estado',
+        'documento',
         'fecha_registro',
         'registrado_por',
         'fecha_actualizacion',

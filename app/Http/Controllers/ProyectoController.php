@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Proyecto;
 
 use DB;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
+use App\Http\Requests\ProyectoRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ProyectoController extends Controller
 {
@@ -39,7 +43,9 @@ class ProyectoController extends Controller
             'proyectos.nombre',
             'proyectos.descripcion',
             'institutos.nombre as instituto',
-            'carreras.nombre as carrera'
+            'carreras.nombre as carrera',
+            'proyectos.portada',
+            'proyectos.documento'
         )
         ->join('institutos', 'institutos.id', '=', 'proyectos.id_instituto')
         ->join('carreras', 'carreras.id', '=', 'proyectos.id_carrera')
@@ -112,5 +118,85 @@ class ProyectoController extends Controller
             'data' => $calificaciones, 
             'puntaje' => $puntajeFinal
         ], 200);
+    }
+
+    public function store(ProyectoRequest $request)
+    {
+        $input = $request->all();
+        // return response()->json($input);
+        $input['estado'] = 'ACTIVO';
+        $input['fecha_registro'] = Carbon::now();
+
+        if ($request->hasFile('portada')) {
+            $file = $request->file('portada');
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            // Guardar en storage/app/departamental
+            $file->storeAs('departamental', $filename);
+
+            $input['portada'] = $filename;
+        }
+
+        if ($request->hasFile('documento')) {
+            $file = $request->file('documento');
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            // Guardar en storage/app/departamental
+            $file->storeAs('departamental', $filename);
+
+            $input['documento'] = $filename;
+        }
+
+        Proyecto::create($input);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Proyecto creado correctamente',
+        ], 201);
+    }
+
+    public function mostrarPortadaPorId($id)
+    {
+        $proyecto = Proyecto::find($id);
+
+        if (!$proyecto || !$proyecto->portada) {
+            return response()->json(['message' => 'Portada no encontrada'], 404);
+        }
+
+        $path = 'departamental/' . $proyecto->portada;
+
+        if (!Storage::disk('local')->exists($path)) {
+            return response()->json(['message' => 'Archivo no encontrado en el servidor'], 404);
+        }
+
+        $file = Storage::get($path);
+        $mimeType = Storage::mimeType($path);
+
+        return response($file, 200)->header('Content-Type', $mimeType);
+    }
+
+    public function mostrarDocumentoPorId($id)
+    {
+        $proyecto = Proyecto::find($id);
+
+        if (!$proyecto || !$proyecto->documento) {
+            return response()->json(['message' => 'Documento no encontrado'], 404);
+        }
+
+        $path = 'departamental/' . $proyecto->documento;
+
+        if (!Storage::disk('local')->exists($path)) {
+            return response()->json(['message' => 'Archivo no encontrado en el servidor'], 404);
+        }
+
+        $file = Storage::get($path);
+
+        $mimeType = Storage::mimeType($path);
+
+        if ($mimeType !== 'application/pdf') {
+            return response()->json(['message' => 'El archivo no es un documento PDF'], 400);
+        }
+
+        return response($file, 200)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Disposition', 'inline; filename="' . basename($path) . '"');
     }
 }
