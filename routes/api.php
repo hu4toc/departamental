@@ -40,6 +40,7 @@ Route::get('/carreras/select', [CarreraController::class, 'select']);
 // Proyectos
 Route::get('/proyectos', [ProyectoController::class, 'index']);
 Route::post('/proyectos', [ProyectoController::class, 'store']);
+Route::post('/proyectos/update/{id}', [ProyectoController::class, 'update']);
 Route::get('/proyectos/{id}', [ProyectoController::class, 'show']);
 Route::get('/proyectos/{id}/integrantes', [ProyectoController::class, 'integrantes']);
 Route::get('/proyectos/{id}/calificaciones', [ProyectoController::class, 'calificaciones']);

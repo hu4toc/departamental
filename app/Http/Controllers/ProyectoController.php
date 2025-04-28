@@ -19,7 +19,9 @@ class ProyectoController extends Controller
             'proyectos.id',
             'proyectos.nombre',
             'proyectos.descripcion',
+            'proyectos.id_instituto',
             'institutos.nombre as instituto',
+            'proyectos.id_carrera',
             'carreras.nombre as carrera'
         )
         ->join('institutos', 'institutos.id', '=', 'proyectos.id_instituto')
@@ -150,6 +152,48 @@ class ProyectoController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Proyecto creado correctamente',
+        ], 201);
+    }
+
+    public function update($id, ProyectoRequest $request)
+    {
+        $proyecto = Proyecto::find($id);
+
+        if (!$proyecto) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Portada no encontrada'
+            ], 404);
+        }
+
+        $input = $request->all();
+        // return response()->json($input);
+        $input['estado'] = 'ACTIVO';
+        $input['fecha_actualizacion'] = Carbon::now();
+
+        if ($request->hasFile('portada')) {
+            $file = $request->file('portada');
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            // Guardar en storage/app/departamental
+            $file->storeAs('departamental', $filename);
+
+            $input['portada'] = $filename;
+        }
+
+        if ($request->hasFile('documento')) {
+            $file = $request->file('documento');
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            // Guardar en storage/app/departamental
+            $file->storeAs('departamental', $filename);
+
+            $input['documento'] = $filename;
+        }
+
+        $proyecto->update($input);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Proyecto actualizado correctamente',
         ], 201);
     }
 
