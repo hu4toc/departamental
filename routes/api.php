@@ -9,6 +9,7 @@ use App\Http\Controllers\InstitutoController;
 use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\EvaluacionController;
+use App\Http\Controllers\PersonaProyectoController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -26,6 +27,7 @@ Route::delete('/indicadores/{id}', [IndicadorController::class, 'destroy']);
 // Personas
 Route::get('/personas', [PersonaController::class, 'index']);
 Route::get('/personas/docentes', [PersonaController::class, 'docentes']);
+Route::get('/personas/integrantes', [PersonaController::class, 'integrantes']);
 
 // Institutos
 Route::get('/institutos', [InstitutoController::class, 'index']);
@@ -46,3 +48,6 @@ Route::get('/proyectos/{id}/documento', [ProyectoController::class, 'mostrarDocu
 
 // Evaluacion
 Route::post('/evaluacion', [EvaluacionController::class, 'store']);
+
+//ProyectoPersona
+Route::post('/personasproyectos', [PersonaProyectoController::class, 'store']);
