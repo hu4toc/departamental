@@ -25,5 +25,6 @@ class Persona extends Model
         'registrado_por',
         'fecha_actualizacion',
         'actualizado_por',
+        'foto'
     ];
 }

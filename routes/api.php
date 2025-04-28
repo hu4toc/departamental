@@ -25,6 +25,7 @@ Route::delete('/indicadores/{id}', [IndicadorController::class, 'destroy']);
 
 
 // Personas
+Route::post('/personas', [PersonaController::class, 'store']);
 Route::get('/personas', [PersonaController::class, 'index']);
 Route::get('/personas/docentes', [PersonaController::class, 'docentes']);
 Route::get('/personas/integrantes', [PersonaController::class, 'integrantes']);
