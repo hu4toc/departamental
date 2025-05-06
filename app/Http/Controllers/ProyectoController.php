@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Proyecto;
+use App\Models\ProyectoCarrera;
 
 use DB;
 use Carbon\Carbon;
@@ -16,24 +17,37 @@ class ProyectoController extends Controller
     public function index()
     {
         $proyectos = Proyecto::select(
-            'proyectos.id',
-            'proyectos.nombre',
-            'proyectos.descripcion',
-            'proyectos.id_instituto',
-            'institutos.nombre as instituto',
-            'proyectos.id_carrera',
-            'carreras.nombre as carrera'
-        )
-        ->join('institutos', 'institutos.id', '=', 'proyectos.id_instituto')
-        ->join('carreras', 'carreras.id', '=', 'proyectos.id_carrera')
-        ->get();
+                'proyectos.id',
+                'proyectos.nombre',
+                'proyectos.descripcion',
+                'proyectos.id_instituto',
+                'institutos.nombre as instituto',
+                'proyectos.id_area',
+                'areas.descripcion as area',
+                DB::raw('GROUP_CONCAT(carreras.nombre SEPARATOR ", ") as carrera'),
+                DB::raw('GROUP_CONCAT(carreras.id SEPARATOR ", ") as id_carrera')
+            )
+            ->join('institutos', 'institutos.id', '=', 'proyectos.id_instituto')
+            ->leftJoin('areas', 'areas.id', '=', 'proyectos.id_area')
+            ->leftJoin('proyectos_carreras', 'proyectos.id', '=', 'proyectos_carreras.id_proyecto')
+            ->leftJoin('carreras', 'carreras.id', '=', 'proyectos_carreras.id_carrera')
+            ->groupBy(
+                'proyectos.id',
+                'proyectos.nombre',
+                'proyectos.descripcion',
+                'proyectos.id_instituto',
+                'institutos.nombre',
+                'proyectos.id_area',
+                'areas.descripcion'
+            )
+            ->orderBy('proyectos.id', 'desc')
+            ->get();
 
         $totalRegistros = count($proyectos);
-        
 
         return response()->json([
-            'success' => true, 
-            'data' => $proyectos, 
+            'success' => true,
+            'data' => $proyectos,
             'totalRegistros' => $totalRegistros
         ], 200);
     }
@@ -41,18 +55,31 @@ class ProyectoController extends Controller
     public function show($id)
     {
         $proyectos = Proyecto::select(
-            'proyectos.id',
-            'proyectos.nombre',
-            'proyectos.descripcion',
-            'institutos.nombre as instituto',
-            'carreras.nombre as carrera',
-            'proyectos.portada',
-            'proyectos.documento'
-        )
-        ->join('institutos', 'institutos.id', '=', 'proyectos.id_instituto')
-        ->join('carreras', 'carreras.id', '=', 'proyectos.id_carrera')
-        ->where('proyectos.id', $id)
-        ->first();
+                'proyectos.id',
+                'proyectos.nombre',
+                'proyectos.descripcion',
+                'proyectos.id_instituto',
+                'institutos.nombre as instituto',
+                'proyectos.id_area',
+                'areas.descripcion as area',
+                DB::raw('GROUP_CONCAT(carreras.nombre SEPARATOR ", ") as carrera'),
+                DB::raw('GROUP_CONCAT(carreras.id SEPARATOR ", ") as id_carrera')
+            )
+            ->join('institutos', 'institutos.id', '=', 'proyectos.id_instituto')
+            ->leftJoin('areas', 'areas.id', '=', 'proyectos.id_area')
+            ->leftJoin('proyectos_carreras', 'proyectos.id', '=', 'proyectos_carreras.id_proyecto')
+            ->leftJoin('carreras', 'carreras.id', '=', 'proyectos_carreras.id_carrera')
+            ->groupBy(
+                'proyectos.id',
+                'proyectos.nombre',
+                'proyectos.descripcion',
+                'proyectos.id_instituto',
+                'institutos.nombre',
+                'proyectos.id_area',
+                'areas.descripcion'
+            )
+            ->where('proyectos.id', $id)
+            ->first();
         
 
         return response()->json([
@@ -125,7 +152,7 @@ class ProyectoController extends Controller
     public function store(ProyectoRequest $request)
     {
         $input = $request->all();
-        // return response()->json($input);
+        
         $input['estado'] = 'ACTIVO';
         $input['fecha_registro'] = Carbon::now();
 
@@ -147,7 +174,18 @@ class ProyectoController extends Controller
             $input['documento'] = $filename;
         }
 
-        Proyecto::create($input);
+        $proyecto = Proyecto::create($input);
+
+        if ($request->id_carrera) {
+            $carreras = array_map('intval', explode(",", $request->id_carrera));
+
+            foreach ($carreras as $id_carrera) {
+                $proyectoCarrera = new ProyectoCarrera;
+                $proyectoCarrera->id_proyecto = $proyecto->id;
+                $proyectoCarrera->id_carrera = $id_carrera;
+                $proyectoCarrera->save();
+            }
+        }
 
         return response()->json([
             'success' => true,
@@ -190,6 +228,17 @@ class ProyectoController extends Controller
         }
 
         $proyecto->update($input);
+
+        if ($request->id_carrera) {
+            $carreras = array_map('intval', explode(",", $request->id_carrera));
+
+            foreach ($carreras as $id_carrera) {
+                $proyectoCarrera = new ProyectoCarrera;
+                $proyectoCarrera->id_proyecto = $proyecto->id;
+                $proyectoCarrera->id_carrera = $id_carrera;
+                $proyectoCarrera->save();
+            }
+        }
 
         return response()->json([
             'success' => true,

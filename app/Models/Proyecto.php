@@ -20,6 +20,6 @@ class Proyecto extends Model
         'fecha_actualizacion',
         'actualizado_por',
         'id_instituto',
-        'id_carrera',
+        'id_area',
     ];
 }

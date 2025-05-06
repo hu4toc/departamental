@@ -10,6 +10,7 @@ use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\PersonaProyectoController;
+use App\Http\Controllers\AreaController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -56,5 +57,8 @@ Route::get('/proyectos/{id}/documento', [ProyectoController::class, 'mostrarDocu
 // Evaluacion
 Route::post('/evaluacion', [EvaluacionController::class, 'store']);
 
-//ProyectoPersona
+// ProyectoPersona
 Route::post('/personasproyectos', [PersonaProyectoController::class, 'store']);
+
+// Areas
+Route::get('/areas/select', [AreaController::class, 'select']);

@@ -27,6 +27,7 @@ class ProyectoRequest extends FormRequest
             'nombre' => 'required',
             'descripcion' => 'required',
             'id_instituto' => 'required',
+            'id_area' => 'required',
             'id_carrera' => 'required',
         ];
     }
@@ -37,6 +38,7 @@ class ProyectoRequest extends FormRequest
             'nombre.required' => 'El campo titulo es requerido',
             'descripcion.required' => 'El campo descripcion es requerido',
             'id_instituto.required' => 'El campo instituto es requerido',
+            'id_area.required' => 'El campo area es requerido',
             'id_carrera.required' => 'El campo carrera es requerido',
         ];
     }
