@@ -26,6 +26,7 @@ class PersonaProyectoRequest extends FormRequest
         return [
             'tipo' => 'required',
             'id_persona' => 'required',
+            'id_carrera' => 'required',
         ];
     }
 
@@ -34,6 +35,7 @@ class PersonaProyectoRequest extends FormRequest
         return [
             'tipo.required' => 'El campo tipo es requerido',
             'id_persona.required' => 'El campo persona es requerido',
+            'id_carrera.required' => 'El campo carrera es requerido',
         ];
     }
 

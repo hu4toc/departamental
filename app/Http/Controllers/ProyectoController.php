@@ -94,10 +94,12 @@ class ProyectoController extends Controller
             'personas.id',
             DB::raw('UPPER(personas.nombres) as nombres'),
             DB::raw('UPPER(personas.apellidos) as apellidos'),
-            DB::raw('UPPER(personas_proyectos.tipo) as tipo')
+            DB::raw('UPPER(personas_proyectos.tipo) as tipo'),
+            DB::raw('UPPER(carreras.nombre) as carrera')
         )
         ->join('personas_proyectos', 'personas_proyectos.id_proyecto', '=', 'proyectos.id')
         ->join('personas', 'personas.id', '=', 'personas_proyectos.id_persona')
+        ->join('carreras', 'carreras.id', '=', 'personas_proyectos.id_carrera')
         ->where('proyectos.id', $id)
         ->orderBy('personas_proyectos.tipo', 'desc')
         ->get();
