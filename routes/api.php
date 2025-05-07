@@ -23,7 +23,7 @@ Route::post('/login', [UserController::class, 'login']);
 Route::post('/usuarios', [UserController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [UserController::class, 'logout']);    
+    Route::post('/logout', [UserController::class, 'logout']);
     
     // Indicadores
     Route::get('/indicadores', [IndicadorController::class, 'index']);
@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/institutos/update/{id}', [InstitutoController::class, 'update']);
     Route::get('/institutos', [InstitutoController::class, 'index']);
     Route::get('/institutos/select', [InstitutoController::class, 'select']);
+    Route::get('/institutos/select/{id}', [InstitutoController::class, 'selectId']);
 
     // Carreras
     Route::get('/carreras', [CarreraController::class, 'index']);

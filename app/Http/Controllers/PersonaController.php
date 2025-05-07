@@ -12,9 +12,13 @@ use Illuminate\Support\Facades\Storage;
 
 class PersonaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $personas = Persona::orderBy('id', 'desc')->get();
+        $personas = Persona::orderBy('id', 'desc')
+            ->when($request->user()->id_instituto, function ($query, $idInstituto) {
+                $query->where('id_instituto', $idInstituto);
+            })
+            ->get();
         $totalRegistros = count($personas);
         
 
@@ -41,12 +45,15 @@ class PersonaController extends Controller
         ], 200);
     }
 
-    public function integrantes()
+    public function integrantes(Request $request)
     {
         $personas = Persona::select(
                 'id as code', 
                 DB::raw('UPPER(CONCAT(nombres, " ", apellidos)) as label')
             )
+            ->when($request->user()->id_instituto, function ($query, $idInstituto) {
+                $query->where('id_instituto', $idInstituto);
+            })
             ->orderBy('nombres', 'asc')
             ->get();
 
@@ -62,6 +69,11 @@ class PersonaController extends Controller
         
         $input['estado'] = 'ACTIVO';
         $input['fecha_registro'] = Carbon::now();
+        $input['registrado_por'] = $request->user()->username;
+
+        if ($request->user()->id_instituto) {
+            $input['id_instituto'] = $request->user()->id_instituto;
+        }
 
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
@@ -95,6 +107,7 @@ class PersonaController extends Controller
         // return response()->json($input);
         $input['estado'] = 'ACTIVO';
         $input['fecha_actualizacion'] = Carbon::now();
+        $input['actualizado_por'] = $request->user()->username;
 
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');

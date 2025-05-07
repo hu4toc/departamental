@@ -38,6 +38,21 @@ class InstitutoController extends Controller
         ], 200);
     }
 
+    public function selectId($id)
+    {
+        $institutos = Instituto::select(
+                'id as code',
+                'nombre as label'
+            )
+            ->where('id', $id)
+            ->get();
+
+        return response()->json([
+            'success' => true, 
+            'data' => $institutos
+        ], 200);
+    }
+
     public function store(InstitutoRequest $request)
     {
         $input = $request->all();

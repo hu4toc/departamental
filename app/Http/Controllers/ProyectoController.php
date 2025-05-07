@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProyectoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $proyectos = Proyecto::select(
                 'proyectos.id',
@@ -31,6 +31,9 @@ class ProyectoController extends Controller
             ->leftJoin('areas', 'areas.id', '=', 'proyectos.id_area')
             ->leftJoin('proyectos_carreras', 'proyectos.id', '=', 'proyectos_carreras.id_proyecto')
             ->leftJoin('carreras', 'carreras.id', '=', 'proyectos_carreras.id_carrera')
+            ->when($request->user()->id_instituto, function ($query, $idInstituto) {
+                $query->where('proyectos.id_instituto', $idInstituto);
+            })
             ->groupBy(
                 'proyectos.id',
                 'proyectos.nombre',
@@ -157,6 +160,7 @@ class ProyectoController extends Controller
         
         $input['estado'] = 'ACTIVO';
         $input['fecha_registro'] = Carbon::now();
+        $input['registrado_por'] = $request->user()->username;
 
         if ($request->hasFile('portada')) {
             $file = $request->file('portada');
@@ -210,6 +214,7 @@ class ProyectoController extends Controller
         // return response()->json($input);
         $input['estado'] = 'ACTIVO';
         $input['fecha_actualizacion'] = Carbon::now();
+        $input['actualizado_por'] = $request->user()->username;
 
         if ($request->hasFile('portada')) {
             $file = $request->file('portada');
